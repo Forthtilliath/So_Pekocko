@@ -65,11 +65,11 @@ exports.likeSauce = (req, res, next) => {
         .then((sauce) => {
             // console.log('userId', req.body.userId);
             // console.log('like', req.body.like);
-            // console.log('AVANT --------------------');
-            // console.log('usersLiked', sauce.usersLiked);
-            // console.log('usersDisliked', sauce.usersDisliked);
-            // console.log('likes', sauce.likes);
-            // console.log('dislikes', sauce.dislikes);
+            console.log('AVANT --------------------');
+            console.log('usersLiked', sauce.usersLiked);
+            console.log('usersDisliked', sauce.usersDisliked);
+            console.log('likes', sauce.likes);
+            console.log('dislikes', sauce.dislikes);
 
             let newValues = {};
 
@@ -78,45 +78,58 @@ exports.likeSauce = (req, res, next) => {
                     console.log("Erreur, l'utilisateur aime déjà la sauce");
                 }
                 newValues = {
-                    usersLiked: [req.body.userId, ...sauce.usersLiked],
-                    likes: sauce.likes + 1,
+                    // usersLiked: [req.body.userId, ...sauce.usersLiked],
+                    $push: { usersLiked: req.body.userId },
+                    // likes: sauce.likes + 1,
+                    $inc: { likes: 1 },
                 };
             } else if (req.body.like === -1) {
                 if (sauce.usersDisliked.includes(req.body.userId)) {
                     console.log("Erreur, l'utilisateur n'aime déjà pas la sauce");
                 }
                 newValues = {
-                    usersDisliked: [req.body.userId, ...sauce.usersDisliked],
-                    dislikes: sauce.dislikes + 1,
+                    // usersDisliked: [req.body.userId, ...sauce.usersDisliked],
+                    $push: { usersDisliked: req.body.userId },
+                    // dislikes: sauce.dislikes + 1,
+                    $inc: { dislikes: -1 },
                 };
             } else {
-                let index = -1;
-                index = sauce.usersLiked.indexOf(req.body.userId);
-                if (index !== -1) {
-                    console.log(sauce.usersLiked.splice(index, 1));
+                // let index = -1;
+                // index = sauce.usersLiked.indexOf(req.body.userId);
+                // if (index !== -1) {
+                if (sauce.usersLiked.includes(req.body.userId)) {
                     newValues = {
-                        usersLiked: sauce.usersLiked.splice(index, 1),
-                        likes: sauce.likes - 1,
+                        // usersLiked: sauce.usersLiked.splice(index, 1),
+                        $pull: { usersLiked: req.body.userId },
+                        // likes: sauce.likes - 1,
+                        $inc: { likes: - 1 },
                     };
-                    console.log("Erreur, l'utilisateur n'aime plus la sauce");
+                    console.log("L'utilisateur n'aime plus la sauce");
                 }
-                index = sauce.usersDisliked.indexOf(req.body.userId);
-                if (index !== -1) {
-                    console.log(sauce.usersDisliked.splice(index, 1));
+                // index = sauce.usersDisliked.indexOf(req.body.userId);
+                // if (index !== -1) {
+                if (sauce.usersDisliked.includes(req.body.userId)) {
                     newValues = {
-                        usersDisliked: sauce.usersDisliked.splice(index, 1),
-                        dislikes: sauce.dislikes - 1,
+                        // usersDisliked: sauce.usersDisliked.splice(index, 1),
+                        $pull: { usersDisliked: req.body.userId },
+                        // dislikes: sauce.dislikes - 1,
+                        $inc: { dislikes: -1 },
                     };
-                    console.log("Erreur, l'utilisateur ne déteste plus la sauce");
+                    console.log("L'utilisateur ne déteste plus la sauce");
                 }
             }
             const sauceObject = Object.assign(sauce, newValues);
-            // console.log('APRES --------------------');
+            console.log('APRES --------------------');
+            console.log('usersLiked', newValues.usersLiked);
+            console.log('usersDisliked', newValues.usersDisliked);
+            console.log('likes', newValues.likes);
+            console.log('dislikes', newValues.dislikes);
             // console.log('usersLiked', sauceObject.usersLiked);
             // console.log('usersDisliked', sauceObject.usersDisliked);
             // console.log('likes', sauceObject.likes);
             // console.log('dislikes', sauceObject.dislikes);
-            Sauce.updateOne({ _id: req.params.id }, sauceObject)
+            // Sauce.updateOne({ _id: req.params.id }, sauceObject)
+            Sauce.updateOne({ _id: req.params.id }, newValues)
                 .then((sauces) => res.status(200).json({ message: 'LIKE ! La sauce a bien été mise à jour !' }))
                 .catch((error) => res.status(404).json(error));
         })
