@@ -17,7 +17,6 @@ module.exports = class File {
     /**
      * Rename an image file with timestamp
      * @param {String} originalname
-     * @returns New name of image file
      */
     static rename(originalname, mimetype) {
         const name = originalname.replaceAll(' ', '_').substring(0, originalname.lastIndexOf('.'));
@@ -25,6 +24,10 @@ module.exports = class File {
         return name + '_' + Date.now() + '.' + extension;
     }
 
+    /**
+     * Generate the url for an image
+     * @param {*} req 
+     */
     static getUrl(req) {
         return `${req.protocol}://${req.get('host')}/${this.path}/${req.file.filename}`;
     }
