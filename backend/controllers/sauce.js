@@ -1,5 +1,5 @@
 const Sauce = require('../models/Sauce');
-const File = require('../src/File');
+const File = require('../classes/File');
 
 exports.getAllSauces = (req, res, next) => {
     Sauce.find()
@@ -32,18 +32,26 @@ exports.createSauce = (req, res, next) => {
 };
 
 exports.editSauce = (req, res, next) => {
-    let sauce = {};
-    if (req.file) {
-        File.remove(req.params.id);
-        sauce = {
-            ...JSON.parse(req.body.sauce),
-            imageUrl: File.getUrl(req),
-        };
-    } else {
-        sauce = { ...req.body };
-    }
-    Sauce.updateOne({ _id: req.params.id }, { _id: req.params.id, ...sauce })
-        .then((sauces) => res.status(200).json({ message: 'La sauce a bien été mise à jour !' }))
+    Sauce.findById(req.params.id)
+        .then((sauce) => {
+            if (sauce.userId !== req.body.userId) {
+                res.status(401).json({ error: 'Authorisation refusée' });
+                return;
+            }
+            let sauceObject = {};
+            if (req.file) {
+                File.remove(req.params.id);
+                sauceObject = {
+                    ...JSON.parse(req.body.sauce),
+                    imageUrl: File.getUrl(req),
+                };
+            } else {
+                sauceObject = { ...req.body };
+            }
+            Sauce.updateOne({ _id: req.params.id }, { _id: req.params.id, ...sauceObject })
+                .then((sauces) => res.status(200).json({ message: 'La sauce a bien été mise à jour !' }))
+                .catch((error) => res.status(404).json(error));
+        })
         .catch((error) => res.status(404).json(error));
 };
 
@@ -52,7 +60,7 @@ exports.deleteSauce = (req, res, next) => {
         .then(() => {
             File.remove(req.params.id);
             Sauce.deleteOne({ _id: req.params.id })
-                .then((sauce) => {
+                .then(() => {
                     res.status(200).json({ message: 'La sauce a bien été supprimée !' });
                 })
                 .catch((error) => res.status(404).json(error));
@@ -65,11 +73,13 @@ exports.likeSauce = (req, res, next) => {
         .then((sauce) => {
             let newValues = {};
             let message = '';
-            let error = '';
 
             if (req.body.like === 1) {
                 if (sauce.usersLiked.includes(req.body.userId)) {
-                    error = "Erreur, l'utilisateur aime déjà la sauce";
+                    throw "Erreur, l'utilisateur aime déjà la sauce";
+                }
+                if (sauce.usersDisliked.includes(req.body.userId)) {
+                    throw "Erreur, l'utilisateur déteste déjà la sauce";
                 }
                 newValues = {
                     $push: { usersLiked: req.body.userId },
@@ -77,8 +87,11 @@ exports.likeSauce = (req, res, next) => {
                 };
                 message = "L'utilisateur aime la sauce";
             } else if (req.body.like === -1) {
+                if (sauce.usersLiked.includes(req.body.userId)) {
+                    throw "Erreur, l'utilisateur aime déjà la sauce";
+                }
                 if (sauce.usersDisliked.includes(req.body.userId)) {
-                    error = "Erreur, l'utilisateur n'aime déjà pas la sauce";
+                    throw "Erreur, l'utilisateur déteste déjà la sauce";
                 }
                 newValues = {
                     $push: { usersDisliked: req.body.userId },
@@ -102,9 +115,8 @@ exports.likeSauce = (req, res, next) => {
                 }
             }
             console.log(message);
-            if (error != '') throw error;
             Sauce.updateOne({ _id: req.params.id }, newValues)
-                .then((sauces) => res.status(200).json(message))
+                .then(() => res.status(200).json(message))
                 .catch((error) => res.status(404).json(error));
         })
         .catch((error) => res.status(404).json(error));
