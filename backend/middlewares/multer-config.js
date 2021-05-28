@@ -1,13 +1,6 @@
 const multer = require('multer');
-const File = require('../classes/File');
+const storage = require('../config/upload');
+// const MulterSharpResizer = require('multer-sharp-resizer');
 
-const storage = multer.diskStorage({
-    destination: (req, file, callback) => {
-        callback(null, 'images');
-    },
-    filename: (req, file, callback) => {
-        callback(null, File.rename(file.originalname, file.mimetype));
-    },
-});
 
-module.exports = multer({ storage: storage }).single('image');
+module.exports = multer(storage).single('image');

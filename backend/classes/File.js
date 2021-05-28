@@ -29,7 +29,7 @@ module.exports = class File {
      * @param {*} req 
      */
     static getUrl(req) {
-        return `${req.protocol}://${req.get('host')}/${this.path}/${req.file.filename}`;
+        return `${req.protocol}://${req.get('host')}/${this.path}/r_${req.file.filename}`;
     }
 
     static remove(id) {
