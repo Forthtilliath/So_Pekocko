@@ -17,5 +17,6 @@ server.create('http', 3000, app);
 
 /**
  * TODO Optimisation
- * [ ] Réduire la taille des images avant de les enregistrer sur le server
+ * [x] Réduire la taille des images avant de les enregistrer sur le server
+ * [ ] Crypter email dans la base
  */
