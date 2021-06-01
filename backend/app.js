@@ -3,6 +3,8 @@ const path    = require('path');
 const helmet  = require('helmet');
 const db      = require('./config/database');
 const app     = express();
+app.set('trust proxy', 1) // trust first proxy
+
 const router  = express.Router();
 db.connectUser();
 

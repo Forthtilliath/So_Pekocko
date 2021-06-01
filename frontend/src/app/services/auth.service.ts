@@ -4,58 +4,59 @@ import { BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Injectable({
-   providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuthService {
-   isAuth$ = new BehaviorSubject<boolean>(false);
-   private authToken: string;
-   private userId: string;
 
-   constructor(private http: HttpClient, private router: Router) {}
+  isAuth$ = new BehaviorSubject<boolean>(false);
+  private authToken: string;
+  private userId: string;
 
-   createUser(email: string, password: string) {
-      return new Promise((resolve, reject) => {
-         this.http.post('http://localhost:3000/api/auth/signup', { email: email, password: password }).subscribe(
-            (response: { message: string }) => {
-               resolve(response);
-            },
-            (error) => {
-               reject(error);
-            },
-         );
-      });
-   }
+  constructor(private http: HttpClient,
+              private router: Router) {}
 
-   getToken() {
-      return this.authToken;
-   }
+  createUser(email: string, password: string) {
+    return new Promise((resolve, reject) => {
+      this.http.post('http://localhost:3000/api/auth/signup', {email: email, password: password}).subscribe(
+        (response: { message: string }) => {
+          resolve(response);
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    });
+  }
 
-   getUserId() {
-      return this.userId;
-   }
+  getToken() {
+    return this.authToken;
+  }
 
-   loginUser(email: string, password) {
-      return new Promise((resolve, reject) => {
-         this.http.post('http://localhost:3000/api/auth/login', { email: email, password: password }).subscribe(
-            (response: { userId: string; token: string }) => {
-               this.userId = response.userId;
-               this.authToken = response.token;
-               this.isAuth$.next(true);
-               localStorage.setItem('token', response.token);
-               resolve();
-            },
-            (error) => {
-               reject(error);
-            },
-         );
-      });
-   }
+  getUserId() {
+    return this.userId;
+  }
 
-   logout() {
-      this.authToken = null;
-      this.userId = null;
-      this.isAuth$.next(false);
-      localStorage.removeItem('token');
-      this.router.navigate(['login']);
-   }
+  loginUser(email: string, password) {
+    return new Promise((resolve, reject) => {
+      this.http.post('http://localhost:3000/api/auth/login', {email: email, password: password}).subscribe(
+        (response: {userId: string, token: string}) => {
+          this.userId = response.userId;
+          this.authToken = response.token;
+          this.isAuth$.next(true);
+          resolve(response);
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    });
+  }
+
+  logout() {
+    this.authToken = null;
+    this.userId = null;
+    this.isAuth$.next(false);
+    this.router.navigate(['login']);
+  }
+
 }
