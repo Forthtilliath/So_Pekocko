@@ -1,7 +1,6 @@
 const { argon2id, argon2Verify } = require('hash-wasm');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const config = require('../config/params');
 const crypto = require('crypto');
 
 exports.signup = (req, res, next) => {
@@ -54,7 +53,7 @@ exports.login = (req, res, next) => {
                     console.log(`L'utilisateur ${req.body.email} est maintenant connecté !`);
                     res.status(200).json({
                         userId: user._id,
-                        token: jwt.sign({ userId: user._id }, config.TOKEN, {
+                        token: jwt.sign({ userId: user._id }, process.env.TOKEN, {
                             expiresIn: '24h',
                         }),
                     });

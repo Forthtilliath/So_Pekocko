@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "hash-wasm": "^4.6.0",
-    "password-validator": "^5.1.1",
-    "sass": "^1.34.0"
-  }
-}

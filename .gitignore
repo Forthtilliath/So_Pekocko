@@ -1,6 +1,4 @@
+/**/node_modules**
 /.doc
-/node_modules
-/backend/node_modules
 /backend/security
-/backend/config/database.js
-/frontend/node_modules
+/backend/.env
