@@ -32,26 +32,18 @@ exports.createSauce = (req, res, next) => {
 };
 
 exports.editSauce = (req, res, next) => {
-    Sauce.findById(req.params.id)
-        .then((sauce) => {
-            if (sauce.userId !== req.body.userId) {
-                res.status(401).json({ error: 'Authorisation refusée' });
-                return;
-            }
-            let sauceObject = {};
-            if (req.file) {
-                File.remove(req.params.id);
-                sauceObject = {
-                    ...JSON.parse(req.body.sauce),
-                    imageUrl: File.getUrl(req),
-                };
-            } else {
-                sauceObject = { ...req.body };
-            }
-            Sauce.updateOne({ _id: req.params.id }, { _id: req.params.id, ...sauceObject })
-                .then((sauces) => res.status(200).json({ message: 'La sauce a bien été mise à jour !' }))
-                .catch((error) => res.status(404).json(error));
-        })
+    let sauceObject = {};
+    if (req.file) {
+        File.remove(req.params.id);
+        sauceObject = {
+            ...JSON.parse(req.body.sauce),
+            imageUrl: File.getUrl(req),
+        };
+    } else {
+        sauceObject = { ...req.body };
+    }
+    Sauce.updateOne({ _id: req.params.id }, { _id: req.params.id, ...sauceObject })
+        .then((sauces) => res.status(200).json({ message: 'La sauce a bien été mise à jour !' }))
         .catch((error) => res.status(404).json(error));
 };
 
