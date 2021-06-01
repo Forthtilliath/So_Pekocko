@@ -1,6 +1,6 @@
-require('dotenv').config();
+               require('dotenv').config();
 const server = require('./controllers/server');
-const app = require('./app');
+const app    = require('./app');
 
 server.create('http', process.env.PORT_HTTP, app);
 // server.create('https', process.env.PORT_HTTPS, app);

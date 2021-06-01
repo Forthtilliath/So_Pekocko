@@ -5,24 +5,17 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+   constructor(private auth: AuthService, private router: Router) {}
 
-  constructor(private auth: AuthService,
-              private router: Router) {}
-
-  canActivate(route: ActivatedRouteSnapshot,
-              state: RouterStateSnapshot): Observable<boolean> {
-    return Observable.create(
-      (observer) => {
-        this.auth.isAuth$.subscribe(
-          (auth) => {
-            if (auth) {
-              observer.next(true);
+   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+      return Observable.create((observer) => {
+         this.auth.isAuth$.subscribe((auth) => {
+            if (auth || typeof localStorage.getItem('token') === 'string') {
+               observer.next(true);
             } else {
-              this.router.navigate(['/login']);
+               this.router.navigate(['/login']);
             }
-          }
-        );
-      }
-    );
-  }
+         });
+      });
+   }
 }
