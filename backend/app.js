@@ -1,9 +1,12 @@
 const express = require('express');
 const path    = require('path');
 const helmet  = require('helmet');
+const nocache = require('nocache')
 const db      = require('./config/database');
 const app     = express();
 app.set('trust proxy', 1) // trust first proxy
+
+// Si cookie-express, utiliser csurf
 
 const router  = express.Router();
 db.connectUser();
@@ -11,12 +14,14 @@ db.connectUser();
 const sauceRoutes = require('./routes/sauce');
 const userRoutes = require('./routes/user');
 
-const headers = require('./config/header');
+const headers = require('./middleware/header');
 const apiLimiter = require('./middleware/apiLimiter');
 
 // Middlewares
-// app.use(apiLimiter);
+app.use(apiLimiter);
 app.use(helmet());
+app.use(headers());
+app.use(nocache());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/images', express.static(path.join(__dirname, 'images')));
@@ -25,6 +30,6 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 router.use('/sauces', sauceRoutes);
 router.use('/auth', userRoutes);
 
-app.use('/api', headers, router);
+app.use('/api', router);
 
 module.exports = app;
