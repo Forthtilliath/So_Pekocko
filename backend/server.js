@@ -1,4 +1,5 @@
                require('dotenv').config();
+               require('pretty-error').start();
 const server = require('./controllers/server');
 const app    = require('./app');
 

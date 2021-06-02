@@ -1,15 +1,19 @@
 {
-    "name": "galerie",
+    "name": "so_pekocko",
     "version": "1.0.0",
     "description": "",
     "main": "server.js",
     "scripts": {
-        "start": "nodemon server.js"
+        "start": "nodemon server.js",
+        "pm": "pm2 start server.js",
+        "del_pm": "pm2 delete 0",
+        "monit": "pm2 monit"
     },
     "author": "",
     "license": "ISC",
     "dependencies": {
         "chalk": "^3.0.0",
+        "compression": "^1.7.4",
         "dotenv": "^10.0.0",
         "email-validator": "^2.0.4",
         "express": "^4.17.1",
@@ -25,6 +29,8 @@
         "nodemon": "^2.0.7",
         "password-validator": "^5.1.1",
         "path": "^0.12.7",
+        "pm2": "^4.5.6",
+        "pretty-error": "^3.0.3",
         "sharp": "^0.25.4",
         "validatorjs": "^3.22.1"
     }

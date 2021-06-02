@@ -1,12 +1,13 @@
-const express = require('express');
-const path    = require('path');
-const helmet  = require('helmet');
-const nocache = require('nocache')
-const db      = require('./config/database');
-const app     = express();
+const express     = require('express');
+const path        = require('path');
+const helmet      = require('helmet');
+const nocache     = require('nocache');
+const compression = require('compression');
+const db          = require('./config/database');
+const app         = express();
 app.set('trust proxy', 1) // trust first proxy
 
-// Si cookie-express, utiliser csurf
+// Si cookie-express, utiliser csurf pour leur protection
 
 const router  = express.Router();
 db.connectUser();
@@ -19,6 +20,7 @@ const apiLimiter = require('./middleware/apiLimiter');
 
 // Middlewares
 app.use(apiLimiter);
+app.use(compression());
 app.use(helmet());
 app.use(headers());
 app.use(nocache());

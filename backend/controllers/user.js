@@ -50,7 +50,7 @@ exports.login = (req, res, next) => {
                     if (!valid) {
                         return res.status(401).json({ error: 'Mot de passe incorrect !' });
                     }
-                    console.log(`L'utilisateur ${req.body.email} est maintenant connecté !`);
+                    console.log(`L'utilisateur ${req.body.email} est maintenant connecté !!`);
                     res.status(200).json({
                         userId: user._id,
                         token: jwt.sign({ userId: user._id }, process.env.TOKEN, {
